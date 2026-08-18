@@ -10,67 +10,85 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body, html { height: 100%; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f172a; color: #fff; overflow: hidden; }
+    body, html { height: 100%; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0b1329; color: #fff; overflow: hidden; }
 
     /* Top Bar */
     .top-bar {
-      height: 55px;
-      background: rgba(15, 23, 42, 0.95);
+      height: 60px;
+      background: rgba(11, 19, 41, 0.95);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 20px;
+      padding: 0 24px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
-      position: relative;
-      z-index: 10;
+      z-index: 100;
     }
-    .title { font-size: 14px; font-weight: 700; color: #f8fafc; }
-    .badge { background: #0284c7; color: #fff; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; margin-left: 8px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .title { font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px; }
+    .badge { background: #0284c7; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
 
     /* Controls Toolbar */
-    .controls { display: flex; align-items: center; gap: 12px; }
-    .btn { background: #334155; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: 0.2s; }
-    .btn:hover { background: #0284c7; }
-    .page-info { font-size: 13px; color: #94a3b8; }
+    .controls { display: flex; align-items: center; gap: 10px; }
+    .btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .btn:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
+    .page-info { font-size: 13px; color: #94a3b8; font-weight: 600; padding: 0 6px; }
 
     /* Social Icons */
     .social-share { display: flex; align-items: center; gap: 8px; }
-    .social-btn { color: #fff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; }
+    .social-btn { color: #fff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: transform 0.2s; }
+    .social-btn:hover { transform: scale(1.1); }
     .social-btn.wa { background: #25D366; }
     .social-btn.li { background: #0A66C2; }
     .social-btn.copy { background: #475569; cursor: pointer; }
 
+    /* Main Container Layout */
+    .main-wrapper { display: flex; height: calc(100vh - 60px); width: 100vw; position: relative; }
+
+    /* Collapsible Index Sidebar */
+    .sidebar {
+      width: 260px;
+      background: #0f172a;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      transition: all 0.3s ease;
+    }
+    .sidebar-title { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+    .toc-item { font-size: 13px; color: #cbd5e1; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+    .toc-item:hover { background: #1e293b; color: #38bdf8; }
+
     /* PDF Viewer Container */
     #pdf-container {
-      height: calc(100vh - 55px);
-      width: 100vw;
+      flex: 1;
       overflow: auto;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       padding: 20px;
-      background: #0f172a;
+      background: #0b1329;
     }
-    canvas {
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      border-radius: 4px;
-      max-width: 100%;
-    }
+    .canvas-wrapper { display: flex; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border-radius: 4px; overflow: hidden; }
+    canvas { background: #fff; display: block; }
   </style>
 </head>
 <body>
 
+  <!-- Top Bar -->
   <div class="top-bar">
-    <div>
+    <div class="brand">
       <span class="title">THE ALIGARH RENAISSANCE</span>
       <span class="badge">Impact Report 2026</span>
     </div>
 
-    <!-- Navigation Controls -->
+    <!-- Navigation & Display Controls -->
     <div class="controls">
       <button class="btn" id="prev"><i class="fas fa-chevron-left"></i> Prev</button>
       <span class="page-info">Page <span id="page-num">1</span> / <span id="page-count">-</span></span>
       <button class="btn" id="next">Next <i class="fas fa-chevron-right"></i></button>
+      <button class="btn" id="toggle-view" title="Toggle Single / Two-Page Spread"><i class="fas fa-book-open"></i> View</button>
       <button class="btn" id="zoom-in"><i class="fas fa-search-plus"></i></button>
       <button class="btn" id="zoom-out"><i class="fas fa-search-minus"></i></button>
       <a href="Report.pdf" download class="btn"><i class="fas fa-download"></i> Download</a>
@@ -84,93 +102,114 @@
     </div>
   </div>
 
-  <div id="pdf-container">
-    <canvas id="pdf-render"></canvas>
+  <div class="main-wrapper">
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <div class="sidebar-title">Quick Index</div>
+      <div class="toc-item" onclick="goToPage(1)">1. Title & Cover Page</div>
+      <div class="toc-item" onclick="goToPage(2)">2. Table of Contents</div>
+      <div class="toc-item" onclick="goToPage(3)">3. Executive Summary & Profile</div>
+      <div class="toc-item" onclick="goToPage(5)">4. Government Data Context</div>
+      <div class="toc-item" onclick="goToPage(7)">5. Quantitative Survey Data</div>
+      <div class="toc-item" onclick="goToPage(8)">6. UN SDG Alignment</div>
+      <div class="toc-item" onclick="goToPage(10)">7. Next Action Items</div>
+    </div>
+
+    <!-- Canvas Rendering Area -->
+    <div id="pdf-container">
+      <div class="canvas-wrapper">
+        <canvas id="pdf-render-left"></canvas>
+        <canvas id="pdf-render-right" style="display: none;"></canvas>
+      </div>
+    </div>
   </div>
+
+  <!-- Page Flip Sound Effect -->
+  <audio id="flip-sound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3" preload="auto"></audio>
 
   <script>
     const url = 'Report.pdf';
-
     let pdfDoc = null,
         pageNum = 1,
-        pageIsRendering = false,
-        pageNumIsPending = null,
-        scale = 1.3,
-        canvas = document.getElementById('pdf-render'),
-        ctx = canvas.getContext('2d');
+        scale = 1.1,
+        isTwoPage = false,
+        canvasLeft = document.getElementById('pdf-render-left'),
+        canvasRight = document.getElementById('pdf-render-right'),
+        ctxLeft = canvasLeft.getContext('2d'),
+        ctxRight = canvasRight.getContext('2d'),
+        flipSound = document.getElementById('flip-sound');
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Render Page
-    const renderPage = num => {
-      pageIsRendering = true;
+    function playSound() {
+      flipSound.currentTime = 0;
+      flipSound.play().catch(() => {});
+    }
 
-      pdfDoc.getPage(num).then(page => {
+    const renderSinglePage = (num, canvas, ctx) => {
+      return pdfDoc.getPage(num).then(page => {
         const viewport = page.getViewport({ scale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
-
-        const renderCtx = {
-          canvasContext: ctx,
-          viewport
-        };
-
-        page.render(renderCtx).promise.then(() => {
-          pageIsRendering = false;
-
-          if (pageNumIsPending !== null) {
-            renderPage(pageNumIsPending);
-            pageNumIsPending = null;
-          }
-        });
-
-        document.getElementById('page-num').textContent = num;
+        return page.render({ canvasContext: ctx, viewport }).promise;
       });
     };
 
-    const queueRenderPage = num => {
-      if (pageIsRendering) {
-        pageNumIsPending = num;
+    const renderPages = () => {
+      renderSinglePage(pageNum, canvasLeft, ctxLeft);
+      
+      if (isTwoPage && (pageNum + 1 <= pdfDoc.numPages)) {
+        canvasRight.style.display = 'block';
+        renderSinglePage(pageNum + 1, canvasRight, ctxRight);
       } else {
-        renderPage(num);
+        canvasRight.style.display = 'none';
       }
+
+      document.getElementById('page-num').textContent = isTwoPage && (pageNum + 1 <= pdfDoc.numPages) ? `${pageNum}-${pageNum+1}` : pageNum;
     };
 
-    // Show Prev Page
+    function goToPage(num) {
+      pageNum = num;
+      playSound();
+      renderPages();
+    }
+
     document.getElementById('prev').addEventListener('click', () => {
+      let step = isTwoPage ? 2 : 1;
       if (pageNum <= 1) return;
-      pageNum--;
-      queueRenderPage(pageNum);
+      pageNum = Math.max(1, pageNum - step);
+      playSound();
+      renderPages();
     });
 
-    // Show Next Page
     document.getElementById('next').addEventListener('click', () => {
+      let step = isTwoPage ? 2 : 1;
       if (pageNum >= pdfDoc.numPages) return;
-      pageNum++;
-      queueRenderPage(pageNum);
+      pageNum = Math.min(pdfDoc.numPages, pageNum + step);
+      playSound();
+      renderPages();
     });
 
-    // Zoom
+    document.getElementById('toggle-view').addEventListener('click', () => {
+      isTwoPage = !isTwoPage;
+      renderPages();
+    });
+
     document.getElementById('zoom-in').addEventListener('click', () => {
-      scale += 0.2;
-      queueRenderPage(pageNum);
-    });
-    document.getElementById('zoom-out').addEventListener('click', () => {
-      if (scale <= 0.8) return;
-      scale -= 0.2;
-      queueRenderPage(pageNum);
+      scale += 0.15;
+      renderPages();
     });
 
-    // Get Document
+    document.getElementById('zoom-out').addEventListener('click', () => {
+      if (scale <= 0.6) return;
+      scale -= 0.15;
+      renderPages();
+    });
+
     pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
       pdfDoc = pdfDoc_;
       document.getElementById('page-count').textContent = pdfDoc.numPages;
-      renderPage(pageNum);
-    }).catch(err => {
-      const div = document.createElement('div');
-      div.className = 'error';
-      div.appendChild(document.createTextNode("Error loading PDF: " + err.message));
-      document.getElementById('pdf-container').appendChild(div);
+      renderPages();
     });
   </script>
 
