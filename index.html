@@ -2,9 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Awareness & Support Camp — Field Impact Report 2026 | The Aligarh Renaissance</title>
-  
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+
+    function trackDownload() {
+      gtag('event', 'pdf_download', {
+        'event_category': 'Engagement',
+        'event_label': 'Field Impact Report 2026 Download'
+      });
+    }
+  </script>
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
@@ -12,39 +27,33 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body, html { height: 100%; font-family: 'Segoe UI', Tahoma, sans-serif; background: #0b1329; color: #fff; overflow: hidden; }
 
-    /* Top Bar */
     .top-bar {
       height: 60px;
       background: rgba(11, 19, 41, 0.95);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 24px;
+      padding: 0 12px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       z-index: 100;
     }
-    .brand { display: flex; align-items: center; gap: 12px; }
-    .title { font-size: 15px; font-weight: 700; color: #f8fafc; letter-spacing: 0.5px; }
-    .badge { background: #0284c7; color: #fff; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+    .brand { display: flex; align-items: center; gap: 8px; }
+    .title { font-size: 13px; font-weight: 700; color: #f8fafc; letter-spacing: 0.3px; white-space: nowrap; }
+    .badge { background: #0284c7; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; white-space: nowrap; }
 
-    /* Controls Toolbar */
-    .controls { display: flex; align-items: center; gap: 10px; }
-    .btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s; }
+    .controls { display: flex; align-items: center; gap: 6px; }
+    .btn { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 4px; }
     .btn:hover { background: #0284c7; color: #fff; border-color: #0284c7; }
-    .page-info { font-size: 13px; color: #94a3b8; font-weight: 600; padding: 0 6px; }
+    .page-info { font-size: 12px; color: #94a3b8; font-weight: 600; white-space: nowrap; }
 
-    /* Social Icons */
-    .social-share { display: flex; align-items: center; gap: 8px; }
-    .social-btn { color: #fff; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: transform 0.2s; }
-    .social-btn:hover { transform: scale(1.1); }
+    .social-share { display: flex; align-items: center; gap: 6px; }
+    .social-btn { color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 12px; }
     .social-btn.wa { background: #25D366; }
     .social-btn.li { background: #0A66C2; }
     .social-btn.copy { background: #475569; cursor: pointer; }
 
-    /* Main Container Layout */
     .main-wrapper { display: flex; height: calc(100vh - 60px); width: 100vw; position: relative; }
 
-    /* Collapsible Index Sidebar */
     .sidebar {
       width: 260px;
       background: #0f172a;
@@ -54,56 +63,81 @@
       flex-direction: column;
       gap: 12px;
       overflow-y: auto;
+      z-index: 99;
+      transition: transform 0.3s ease;
     }
     .sidebar-title { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
     .toc-item { font-size: 13px; color: #cbd5e1; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
     .toc-item:hover { background: #1e293b; color: #38bdf8; }
 
-    /* PDF Viewer Container */
     #pdf-container {
       flex: 1;
       overflow: auto;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 20px;
+      align-items: flex-start;
+      padding: 10px;
       background: #0b1329;
     }
-    .canvas-wrapper { display: flex; gap: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); border-radius: 4px; overflow: hidden; }
-    canvas { background: #fff; display: block; }
+    .canvas-wrapper { display: flex; gap: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-radius: 4px; overflow: hidden; max-width: 100%; }
+    canvas { background: #fff; display: block; max-width: 100%; height: auto !important; }
+
+    #sidebar-toggle { display: none; }
+
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      .badge, .btn-text, #toggle-view, #zoom-in, #zoom-out, .social-share { display: none !important; }
+      #sidebar-toggle { display: inline-flex !important; }
+      
+      .top-bar { padding: 0 8px; }
+      .title { font-size: 12px; }
+      .controls { gap: 4px; }
+      .btn { padding: 6px 8px; font-size: 11px; }
+      
+      .sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        transform: translateX(-100%);
+        box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      
+      .canvas-wrapper { flex-direction: column; gap: 0; width: 100%; }
+      canvas { width: 100% !important; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Top Bar -->
   <div class="top-bar">
     <div class="brand">
+      <button class="btn" id="sidebar-toggle"><i class="fas fa-bars"></i></button>
       <span class="title">THE ALIGARH RENAISSANCE</span>
       <span class="badge">Impact Report 2026</span>
     </div>
 
-    <!-- Navigation & Display Controls -->
     <div class="controls">
-      <button class="btn" id="prev"><i class="fas fa-chevron-left"></i> Prev</button>
-      <span class="page-info">Page <span id="page-num">1</span> / <span id="page-count">-</span></span>
-      <button class="btn" id="next">Next <i class="fas fa-chevron-right"></i></button>
-      <button class="btn" id="toggle-view" title="Toggle Single / Two-Page Spread"><i class="fas fa-book-open"></i> View</button>
+      <button class="btn" id="prev"><i class="fas fa-chevron-left"></i> <span class="btn-text">Prev</span></button>
+      <span class="page-info"><span id="page-num">1</span>/<span id="page-count">-</span></span>
+      <button class="btn" id="next"><span class="btn-text">Next</span> <i class="fas fa-chevron-right"></i></button>
+      <button class="btn" id="toggle-view" title="Toggle View"><i class="fas fa-book-open"></i></button>
       <button class="btn" id="zoom-in"><i class="fas fa-search-plus"></i></button>
       <button class="btn" id="zoom-out"><i class="fas fa-search-minus"></i></button>
-      <a href="Report.pdf" download class="btn"><i class="fas fa-download"></i> Download</a>
+      <a href="Report.pdf" download class="btn" onclick="trackDownload()"><i class="fas fa-download"></i> <span class="btn-text">Download</span></a>
     </div>
 
-    <!-- Social Share -->
     <div class="social-share">
-      <a href="https://api.whatsapp.com/send?text=Check%20out%20our%20Report:%20https://aligarhrenaissance.github.io/field-impact-report-2026/" target="_blank" class="social-btn wa"><i class="fab fa-whatsapp"></i></a>
+      <a href="https://api.whatsapp.com/send?text=https://aligarhrenaissance.github.io/field-impact-report-2026/" target="_blank" class="social-btn wa"><i class="fab fa-whatsapp"></i></a>
       <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://aligarhrenaissance.github.io/field-impact-report-2026/" target="_blank" class="social-btn li"><i class="fab fa-linkedin-in"></i></a>
       <div class="social-btn copy" onclick="navigator.clipboard.writeText(window.location.href); alert('Link Copied!');"><i class="fas fa-link"></i></div>
     </div>
   </div>
 
   <div class="main-wrapper">
-    <!-- Sidebar Navigation -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <div class="sidebar-title">Quick Index</div>
       <div class="toc-item" onclick="goToPage(1)">1. Title & Cover Page</div>
       <div class="toc-item" onclick="goToPage(2)">2. Table of Contents</div>
@@ -114,7 +148,6 @@
       <div class="toc-item" onclick="goToPage(10)">7. Next Action Items</div>
     </div>
 
-    <!-- Canvas Rendering Area -->
     <div id="pdf-container">
       <div class="canvas-wrapper">
         <canvas id="pdf-render-left"></canvas>
@@ -128,51 +161,47 @@
     let pdfDoc = null,
         pageNum = 1,
         scale = 1.0,
-        isTwoPage = true,
+        isTwoPage = window.innerWidth > 768,
         canvasLeft = document.getElementById('pdf-render-left'),
         canvasRight = document.getElementById('pdf-render-right'),
         ctxLeft = canvasLeft.getContext('2d'),
-        ctxRight = canvasRight.getContext('2d');
+        ctxRight = canvasRight.getContext('2d'),
+        sidebar = document.getElementById('sidebar');
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Native Web Audio Synthesizer for Paper Flip Sound
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     
     function playPaperSound() {
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-      
+      if (audioCtx.state === 'suspended') audioCtx.resume();
       const bufferSize = audioCtx.sampleRate * 0.08; 
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
-      
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
+      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
       
       const noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
-      
       const filter = audioCtx.createBiquadFilter();
       filter.type = 'bandpass';
       filter.frequency.value = 1000;
       filter.Q.value = 0.5;
-      
       const gain = audioCtx.createGain();
       gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-      
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(audioCtx.destination);
-      
       noise.start();
     }
 
     const renderSinglePage = (num, canvas, ctx) => {
       return pdfDoc.getPage(num).then(page => {
+        let containerWidth = document.getElementById('pdf-container').clientWidth - 20;
+        if (window.innerWidth <= 768) {
+          let unscaledViewport = page.getViewport({ scale: 1.0 });
+          scale = containerWidth / unscaledViewport.width;
+        }
+        
         const viewport = page.getViewport({ scale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
@@ -181,6 +210,7 @@
     };
 
     const renderPages = () => {
+      isTwoPage = window.innerWidth > 768 && isTwoPage;
       renderSinglePage(pageNum, canvasLeft, ctxLeft);
       
       if (isTwoPage && (pageNum + 1 <= pdfDoc.numPages)) {
@@ -196,8 +226,13 @@
     function goToPage(num) {
       pageNum = num;
       playPaperSound();
+      if (window.innerWidth <= 768) sidebar.classList.remove('open');
       renderPages();
     }
+
+    document.getElementById('sidebar-toggle').addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
 
     document.getElementById('prev').addEventListener('click', () => {
       let step = isTwoPage ? 2 : 1;
@@ -216,8 +251,10 @@
     });
 
     document.getElementById('toggle-view').addEventListener('click', () => {
-      isTwoPage = !isTwoPage;
-      renderPages();
+      if (window.innerWidth > 768) {
+        isTwoPage = !isTwoPage;
+        renderPages();
+      }
     });
 
     document.getElementById('zoom-in').addEventListener('click', () => {
@@ -228,6 +265,10 @@
     document.getElementById('zoom-out').addEventListener('click', () => {
       if (scale <= 0.5) return;
       scale -= 0.15;
+      renderPages();
+    });
+
+    window.addEventListener('resize', () => {
       renderPages();
     });
 
